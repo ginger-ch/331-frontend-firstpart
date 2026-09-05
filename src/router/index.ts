@@ -11,6 +11,7 @@ import NetworkErrorView from '@/views/NetworkErrorView.vue'
 import nProgress from 'nprogress'
 import { useEventStore } from '@/stores/event'
 import AddEventView from '@/views/event/EventFormView.vue'
+import OrganizerFormView from '@/views/event/OrganizerFormView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -36,7 +37,6 @@ const router = createRouter({
         const eventStore = useEventStore()
         return EventService.getEvent(id)
           .then((response) => {
-            // need to setup the data for the event
             eventStore.setEvent(response.data)
           })
           .catch((error) => {
@@ -72,6 +72,11 @@ const router = createRouter({
       path: '/add-event',
       name: 'add-event',
       component: AddEventView,
+    },
+    {
+      path: '/add-organizer',
+      name: 'add-organizer',
+      component: OrganizerFormView
     },
     {
       path: '/404/:resource',
