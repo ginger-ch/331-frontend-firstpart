@@ -6,12 +6,16 @@ const apiClient = axios.create({
   withCredentials: false,
   headers: {
     Accept: 'application/json',
+    'Content-Type': 'application/json',
   },
 })
 
 export default {
-  getOrganizers(perPage: number, page: number) {
-    return apiClient.get('/organizers?_limit=' + perPage + '&_page=' + page)
+  getOrganizers(perPage?: number, page?: number) {
+    if (perPage !== undefined && page !== undefined) {
+      return apiClient.get('/organizers?_limit=' + perPage + '&_page=' + page)
+    }
+    return apiClient.get('/organizers')
   },
   getOrganizer(id: number) {
     return apiClient.get('/organizers/' + id)
