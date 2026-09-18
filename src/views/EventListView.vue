@@ -3,8 +3,27 @@ import EventService from '@/services/EventService'
 import EventCard from '@/components/EventCard.vue'
 import type { Event } from '@/types'
 import { ref, onMounted, computed, watchEffect } from 'vue'
+import BaseInput from '@/components/BaseInput.vue'
+import router from '@/router'
 const events = ref<Event[] | null>(null)
 const totalEvents = ref<number>(0)
+const keyword = ref('')
+  function updateKeyword() {
+    let queryFunction
+    if (keyword.value === '') {
+      queryFunction = EventService.getEvents(3, page.value)
+      } else {
+      queryFunction = EventService.getEventsByKeyword(keyword.value, 3, page.value)
+    }
+    queryFunction.then((response) => {
+      events.value = response.data
+      console.log('events', events.value)
+      totalEvents.value = response.headers['x-total-count']
+      console.log('totalEvent', totalEvents.value)
+    }).catch(() => {
+      router.push({ name: 'network-error-view'})
+    })
+  }
 const hasNextPage = computed(() => {
   const totalPages = Math.ceil(totalEvents.value / 3)
   return page.value < totalPages
@@ -17,7 +36,6 @@ const props = defineProps({
 })
 const page = computed(() => props.page)
 onMounted(() => {
-  events.value = null
   watchEffect(() => {
     EventService.getEvents(3, page.value)
       .then((response) => {
@@ -33,8 +51,15 @@ onMounted(() => {
 
 <template>
   <h1>Events For Good</h1>
-  <div class="flex flex-col items-center">
-    <EventCard v-for="event in events" :key="event.id" :event="event" />
+  <main class="flex flex-col items-center">
+    <div class="w-64">
+      <BaseInput
+        v-model="keyword"
+        label="Search..."
+        @input="updateKeyword"
+        class="w-full" />
+    </div>
+    <EventCard v-for="event in events" :key="event.id!" :event="event" />
 
     <div class="pagination">
       <RouterLink
@@ -53,7 +78,7 @@ onMounted(() => {
         >Next Page</RouterLink
       >
     </div>
-  </div>
+  </main>
 </template>
 <style scoped>
 .pagination {
