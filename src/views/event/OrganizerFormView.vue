@@ -1,26 +1,37 @@
 <script setup lang="ts">
 import type { Organizer } from '@/types'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import OrganizerService from '@/services/OrganizerService'
 import { useRouter } from 'vue-router'
 import { useMessageStore } from '@/stores/message'
+import ImageUpload from '@/components/ImageUpload.vue'
 
 const organizer = ref<Organizer>({
   id: null,
-  organizationName: '',
+  name: '',
   address: '',
+  image: '',
 })
 
 const router = useRouter()
 const store = useMessageStore()
 
+//แปลงstringรูปเดียวให้เข้ากับarrayของimageUpload
+const imageMedia = computed({
+  get: () => (organizer.value.image ? [organizer.value.image] : []),
+  set: (val: string[]) => {
+    organizer.value.image = val.length > 0 ? val[val.length - 1] : ''
+  },
+})
+
 function saveOrganizer() {
   OrganizerService.saveOrganizer(organizer.value)
     .then((response) => {
+      //ไปหน้าdetailของ Organizer ที่เพิ่งสร้างใหม่่
       router.push({ name: 'event-list-view' })
-      store.updateMessage(
-        'You have successfully added a new organizer: ' + response.data.organizationName
-      )
+
+      //Flash Messageใช้ชื่อ response.data.name
+      store.updateMessage('You have successfully added a new organizer: ' + response.data.name || '')
       setTimeout(() => {
         store.resetMessage()
       }, 3000)
@@ -38,7 +49,7 @@ function saveOrganizer() {
       <div>
         <label class="block text-gray-500 font-bold mb-1">Organization Name</label>
         <input
-          v-model="organizer.organizationName"
+          v-model="organizer.name"
           type="text"
           placeholder="Organization Name"
           required
@@ -56,6 +67,9 @@ function saveOrganizer() {
           class="h-12 w-full px-3 text-lg border border-gray-400 rounded focus:border-emerald-500 focus:outline-none"
         />
       </div>
+
+      <h3 class="text-lg font-bold text-gray-700 mt-2">The image of the Organizer</h3>
+      <ImageUpload v-model="imageMedia" :max="1" />
 
       <button
         class="mt-4 flex w-fit mx-auto items-center justify-center h-12 px-8 rounded-md font-semibold border border-gray-400 hover:border-emerald-500 hover:scale-105 transition-all focus:outline-none"

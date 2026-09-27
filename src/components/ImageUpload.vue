@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import Uploader from 'vue-media-upload'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+
+withDefaults(
+  defineProps<{
+    max?: number
+  }>(),
+  {
+    max: 99,
+  }
+)
 
 interface UploadMedia {
   name: string
@@ -34,8 +43,16 @@ const uploadUrl = ref(import.meta.env.VITE_UPLOAD_URL)
 const onChanged = (files: UploadMedia[]): void => {
   modelValue.value = convertMediaToString(files)
 }
+
+watch(
+  () => modelValue.value,
+  (newVal) => {
+    media.value = convertStringToMedia(newVal)
+  },
+  { deep: true }
+)
 </script>
 
 <template>
-  <Uploader :server="uploadUrl" @change="onChanged" :media="media"></Uploader>
+  <Uploader :server="uploadUrl" @change="onChanged" :media="media" :max="max"></Uploader>
 </template>
