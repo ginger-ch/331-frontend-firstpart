@@ -12,6 +12,7 @@ import nProgress from 'nprogress'
 import { useEventStore } from '@/stores/event'
 import AddEventView from '@/views/event/EventFormView.vue'
 import OrganizerFormView from '@/views/event/OrganizerFormView.vue'
+import OrganizerDetailView from '@/views/organizer/OrganizerDetailView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -79,6 +80,12 @@ const router = createRouter({
       component: OrganizerFormView
     },
     {
+      path: '/organizer/:id',
+      name: 'organizer-detail-view',
+      component: OrganizerDetailView,
+      props: true
+    },
+    {
       path: '/404/:resource',
       name: '404-resource-view',
       component: NotFoundView,
@@ -89,7 +96,6 @@ const router = createRouter({
       name: 'network-error-view',
       component: NetworkErrorView,
     },
-
     {
       path: '/:catchAll(.*)*',
       name: 'not-found',

@@ -27,16 +27,18 @@ const imageMedia = computed({
 function saveOrganizer() {
   OrganizerService.saveOrganizer(organizer.value)
     .then((response) => {
-      //ไปหน้าdetailของ Organizer ที่เพิ่งสร้างใหม่่
-      router.push({ name: 'event-list-view' })
+      //ไปหน้าorg detail view
+      router.push({
+        name: 'organizer-detail-view',
+        params: { id: response.data.id }
+      })
 
-      //Flash Messageใช้ชื่อ response.data.name
-      store.updateMessage('You have successfully added a new organizer: ' + response.data.name || '')
+      store.updateMessage('You have successfully added a new organizer: ' + response.data.name)
       setTimeout(() => {
         store.resetMessage()
       }, 3000)
     })
-    .catch(() => {
+    .catch((error) => {
       router.push({ name: 'network-error-view' })
     })
 }
